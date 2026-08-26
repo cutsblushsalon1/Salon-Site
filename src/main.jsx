@@ -32,11 +32,11 @@ const services = [
   },
   {
     title: "Hair Smoothing",
-    price: "From ₹3,499",
+    price: "From ₹3,499 onwards",
   },
   {
     title: "Hair Botox",
-    price: "From ₹3,999",
+    price: "From ₹3,999 onwards",
   },
 ];
 
@@ -111,26 +111,31 @@ const WHATSAPP_NUMBER = "919279874506";
 const staffMembers = [
   {
     name: "Nadeem Ahmad",
-    role: "Creative Director",
+    experience: 16,
+    role: "Creative Director & Hair Expert",
     image: "/staffs/staff1.jpg",
   },
   {
     name: "Hanshika Singh",
+    experience: 10,
     role: "Senior Make-up & Skin Artist",
     image: "/staffs/staff2.jpg",
   },
   {
     name: "Anjali Paswan",
+    experience: 6,
     role: "Senior Beautician & Make-up Artist",
     image: "/staffs/staff3.jpg",
   },
   {
     name: "Rihan Salmani",
-    role: "Senior Hair Artist",
+    experience: 10,
+    role: "Senior Hair & Skin Artist",
     image: "/staffs/staff4.jpg",
   },
   {
-    name: "Priya",
+    name: "Priya Kumari",
+    experience: 5,
     role: "Senior Beautician & Hair Artist",
     image: "/staffs/staff5.jpg",
   },
@@ -803,6 +808,10 @@ I would like to know more and purchase this membership.`;
                         </h3>
 
                         <p className="mt-2 text-xs text-white/40">
+                          {member.experience} Years of Experience
+                        </p>
+
+                        <p className="mt-0 text-xs text-white/60">
                           {member.role}
                         </p>
                       </div>

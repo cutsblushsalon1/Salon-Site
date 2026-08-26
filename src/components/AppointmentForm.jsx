@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Flower2, Scissors, Users, Calendar, Clock, CheckCircle2, AlertCircle, ArrowUpRight } from "lucide-react";
+import { Flower2, Scissors, Users, CheckCircle2, AlertCircle, ArrowUpRight } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "../lib/supabaseClient";
 import { usePublicServices } from "../hooks/usePublicServices";
 import ServicePicker from "./ServicePicker";
@@ -7,8 +7,8 @@ import ServicePicker from "./ServicePicker";
 const WHATSAPP_NUMBER = "919279874506";
 
 const GENDER_CARDS = [
-  { id: "Female", label: "Female", icon: Flower2 },
   { id: "Male", label: "Male", icon: Scissors },
+  { id: "Female", label: "Female", icon: Flower2 },
   { id: "all", label: "Both", icon: Users },
 ];
 
