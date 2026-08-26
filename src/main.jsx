@@ -17,6 +17,7 @@ import "./global.css";
 import Header from "./components/Header";
 import Marquee from "./components/Marquee";
 import Footer from "./components/Footer";
+import AppointmentForm from "./components/AppointmentForm";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -115,11 +116,11 @@ const staffMembers = [
   },
   {
     name: "Hanshika Singh",
-    role: "Senior Make-up Artist",
+    role: "Senior Make-up & Skin Artist",
     image: "/staffs/staff2.jpg",
   },
   {
-    name: "Anjali",
+    name: "Anjali Paswan",
     role: "Senior Beautician & Make-up Artist",
     image: "/staffs/staff3.jpg",
   },
@@ -130,7 +131,7 @@ const staffMembers = [
   },
   {
     name: "Priya",
-    role: "Senior Beautician",
+    role: "Senior Beautician & Hair Artist",
     image: "/staffs/staff5.jpg",
   },
 ];
@@ -638,9 +639,10 @@ I would like to know more and purchase this membership.`;
               <em>than a salon.</em>
             </h2>
             <p className="mt-7 max-w-lg text-base leading-7 text-black/60">
-              We believe premium isn't about being complicated. It's about
-              listening carefully, getting the details right and giving you
-              space to enjoy the process.
+              From soft, natural looks to glamorous occasion makeup, our artists
+              create a look that complements your features, outfit and
+              personality. Every detail is carefully finished for a flawless,
+              confident look that lasts.
             </p>
             <div className="mt-10 grid grid-cols-2 gap-3">
               {[
@@ -973,58 +975,7 @@ I would like to know more and purchase this membership.`;
               </div>
             </div>
           </div>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              window.location.href = "tel:+919279874506";
-            }}
-            className="reveal rounded-[2rem] bg-white p-6 shadow-soft md:p-9"
-          >
-            <div className="grid gap-5 sm:grid-cols-2">
-              <label className="field">
-                <span>Your name</span>
-                <input required name="name" placeholder="Full name" />
-              </label>
-              <label className="field">
-                <span>Phone number</span>
-                <input required name="phone" type="tel" placeholder="+91" />
-              </label>
-              <label className="field">
-                <span>Service</span>
-                <select name="service" defaultValue="">
-                  <option value="" disabled>
-                    Select a service
-                  </option>
-                  <option>Hair Artistry</option>
-                  <option>Skin & Glow</option>
-                  <option>Grooming</option>
-                  <option>Beauty Rituals</option>
-                </select>
-              </label>
-              <label className="field">
-                <span>Preferred date</span>
-                <input required name="date" type="date" />
-              </label>
-              <label className="field sm:col-span-2">
-                <span>Preferred time</span>
-                <select name="time" defaultValue="">
-                  <option value="" disabled>
-                    Choose a time
-                  </option>
-                  <option>Morning · 9 AM – 12 PM</option>
-                  <option>Afternoon · 12 PM – 4 PM</option>
-                  <option>Evening · 4 PM – 9 PM</option>
-                </select>
-              </label>
-            </div>
-            <button className="mt-7 w-full rounded-full bg-ink px-6 py-4 text-sm font-semibold text-white transition hover:-translate-y-0.5">
-              Request appointment
-            </button>
-            <p className="mt-3 text-center text-xs text-black/40">
-              By submitting, you'll be redirected to call the salon for
-              confirmation.
-            </p>
-          </form>
+          <AppointmentForm />
         </div>
       </section>
 
