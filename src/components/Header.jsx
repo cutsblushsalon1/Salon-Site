@@ -4,6 +4,7 @@ import { ArrowUpRight, Menu, X } from "lucide-react";
 
 const navItems = [
   { label: "Services", href: "#services" },
+  { label: "Membership", href: "#membership" },
   { label: "Experience", href: "#experience" },
   { label: "Team", href: "#team" },
   { label: "Looks", href: "#looks" },
@@ -21,7 +22,17 @@ function Header() {
     const handleScroll = () => {
       setScrolled(window.scrollY > 40);
 
-      const sections = ["top", "services", "experience", "team", "looks", "book", "reviews", "contact"];
+      const sections = [
+        "top",
+        "services",
+        "membership",
+        "experience",
+        "team",
+        "looks",
+        "book",
+        "reviews",
+        "contact",
+      ];
 
       const current = sections.find((id) => {
         const section = document.getElementById(id);
@@ -118,7 +129,7 @@ function Header() {
             >
               <div className="flex items-baseline font-display text-[1.1rem] tracking-[-0.03em] sm:text-xl">
                 Cuts & Blush Salon
-              </div>              
+              </div>
             </a>
 
             {/* DESKTOP NAVIGATION */}
