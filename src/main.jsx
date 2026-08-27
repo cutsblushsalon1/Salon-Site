@@ -112,7 +112,7 @@ const staffMembers = [
   {
     name: "Nadeem Ahmad",
     experience: 16,
-    role: "Creative Director & Hair Expert",
+    role: "Creative Director - Hair Expert",
     image: "/staffs/staff1.jpg",
   },
   {
