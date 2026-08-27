@@ -1,15 +1,18 @@
-import React, { useState } from "react";
-import { Flower2, Scissors, Users, CheckCircle2, AlertCircle, ArrowUpRight } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { Flower2, Scissors, Users, Calendar, Clock, CheckCircle2, AlertCircle, ArrowUpRight } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "../lib/supabaseClient";
 import { usePublicServices } from "../hooks/usePublicServices";
+import { usePublicStaff } from "../hooks/usePublicStaff";
+import { useTakenSlots } from "../hooks/useTakenSlots";
 import ServicePicker from "./ServicePicker";
+import StaffPicker from "./StaffPicker";
 
 const WHATSAPP_NUMBER = "919279874506";
 
 const GENDER_CARDS = [
   { id: "Male", label: "Male", icon: Scissors },
   { id: "Female", label: "Female", icon: Flower2 },
-  { id: "all", label: "Both", icon: Users },
+  { id: "all", label: "Either", icon: Users },
 ];
 
 function buildTimePeriods() {
@@ -41,16 +44,30 @@ function todayISO() {
 
 export default function AppointmentForm() {
   const { services, loading: servicesLoading, error: servicesError } = usePublicServices();
+  const { staff, loading: staffLoading } = usePublicStaff();
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [gender, setGender] = useState("all");
   const [service, setService] = useState(null);
+  const [staffId, setStaffId] = useState(null);
+  const [staffName, setStaffName] = useState(null);
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState(null);
+
+  const { takenSlots, loading: takenLoading, refetch: refetchTakenSlots } = useTakenSlots(staffId, date);
+
+  function handleStaffSelect(id, fullName) {
+    setStaffId(id);
+    setStaffName(id ? fullName : null);
+  }
+
+  useEffect(() => {
+    if (time && takenSlots.includes(time)) setTime("");
+  }, [takenSlots]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function handleGenderChange(next) {
     setGender(next);
@@ -73,6 +90,15 @@ export default function AppointmentForm() {
       setResult({ ok: false, message: "Please choose a preferred time." });
       return;
     }
+    if (takenSlots.includes(time)) {
+      setResult({
+        ok: false,
+        message: staffId
+          ? `${staffName} is already booked at ${time}. Please pick a different time.`
+          : `That time is fully booked. Please pick a different time.`,
+      });
+      return;
+    }
 
     const appointmentGender = gender !== "all" ? gender : service.gender || null;
 
@@ -80,7 +106,7 @@ export default function AppointmentForm() {
     setResult(null);
 
     if (!isSupabaseConfigured) {
-      const message = `Hi *Cuts & Blush Salon!*\n\nI'd like to book an appointment.\n*Name:* ${name}\n*Phone:* ${phone}\n*For:* ${appointmentGender === "Female" ? "Her" : appointmentGender === "Male" ? "Him" : "-"}\n*Service:* ${service.name} (₹${Number(service.price).toLocaleString("en-IN")})\n*Date:* ${date}\n*Time:* ${time}${notes ? `\n*Notes:* ${notes}` : ""}`;
+      const message = `Hi *Cuts & Blush Salon!*\n\nI'd like to book an appointment.\n*Name:* ${name}\n*Phone:* ${phone}\n*For:* ${appointmentGender === "Female" ? "Her" : appointmentGender === "Male" ? "Him" : "-"}\n*Service:* ${service.name} (₹${Number(service.price).toLocaleString("en-IN")})\n*Stylist:* ${staffName || "No preference"}\n*Date:* ${date}\n*Time:* ${time}${notes ? `\n*Notes:* ${notes}` : ""}`;
       window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, "_blank");
       setSubmitting(false);
       return;
@@ -91,6 +117,8 @@ export default function AppointmentForm() {
       phone: phone.trim(),
       gender: appointmentGender,
       service_name: service.name,
+      staff_id: staffId,
+      staff_name: staffName,
       appointment_date: date,
       appointment_time: time,
       notes: notes.trim() || null,
@@ -100,8 +128,18 @@ export default function AppointmentForm() {
     setSubmitting(false);
 
     if (error) {
+      const isSlotConflict = error.message?.includes("SLOT_TAKEN") || error.message?.includes("SLOT_FULL");
       console.error("[supabase] failed to create appointment:", error.message);
-      setResult({ ok: false, message: "Something went wrong sending your request. Please call or WhatsApp us instead." });
+      setResult({
+        ok: false,
+        message: isSlotConflict
+          ? "Sorry — someone just booked that exact slot. Please pick a different time."
+          : "Something went wrong sending your request. Please call or WhatsApp us instead.",
+      });
+      if (isSlotConflict) {
+        setTime("");
+        refetchTakenSlots();
+      }
       return;
     }
 
@@ -110,6 +148,8 @@ export default function AppointmentForm() {
     setPhone("");
     setGender("all");
     setService(null);
+    setStaffId(null);
+    setStaffName(null);
     setDate("");
     setTime("");
     setNotes("");
@@ -123,11 +163,11 @@ export default function AppointmentForm() {
       {/* Gold accent strip */}
       <div className="h-1.5 w-full bg-gradient-to-r from-gold via-[#e3cf9c] to-gold" />
 
-      <div className="p-6 md:p-8">
+      <div className="p-6 md:p-9">
         {/* Step 1 — who & how to reach you */}
         <div className="mb-8">
-          <p className="mb-4 flex items-center gap-2 text-xs font-bold uppercase tracking-[.18em] text-black/35">
-            <span className="w-6 h-6 pl-0.5 flex justify-center items-center leading-none rounded-full bg-ink text-xs text-white">1</span>
+          <p className="mb-4 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[.18em] text-black/35">
+            <span className="pl-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-ink text-[10px] text-white">1</span>
             Your details
           </p>
           <div className="grid gap-5 sm:grid-cols-2">
@@ -157,8 +197,8 @@ export default function AppointmentForm() {
 
         {/* Step 2 — who's this for */}
         <div className="mb-8">
-          <p className="mb-4 flex items-center gap-2 text-xs font-bold uppercase tracking-[.18em] text-black/35">
-            <span className="w-6 h-6 pl-0.5 flex justify-center items-center leading-none rounded-full bg-ink text-xs text-white">2</span>
+          <p className="mb-4 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[.18em] text-black/35">
+            <span className="pl-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-ink text-[10px] text-white">2</span>
             Who's this for?
           </p>
           <div className="grid grid-cols-3 gap-3">
@@ -193,8 +233,8 @@ export default function AppointmentForm() {
 
         {/* Step 3 — service */}
         <div className="mb-8">
-          <p className="mb-4 flex items-center gap-2 text-xs font-bold uppercase tracking-[.18em] text-black/35">
-            <span className="w-6 h-6 pl-0.5 flex justify-center items-center leading-none rounded-full bg-ink text-xs text-white">3</span>
+          <p className="mb-4 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[.18em] text-black/35">
+            <span className="pl-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-ink text-[10px] text-white">3</span>
             Choose a service
           </p>
           <ServicePicker
@@ -208,16 +248,25 @@ export default function AppointmentForm() {
           />
         </div>
 
-        {/* Step 4 — date & time */}
+        {/* Step 4 — staff (optional) */}
         <div className="mb-8">
-          <p className="mb-4 flex items-center gap-2 text-xs font-bold uppercase tracking-[.18em] text-black/35">
-            <span className="w-6 h-6 pl-0.5 flex justify-center items-center leading-none rounded-full bg-ink text-xs text-white">4</span>
+          <p className="mb-4 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[.18em] text-black/35">
+            <span className="pl-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-ink text-[10px] text-white">4</span>
+            Pick your stylist
+          </p>
+          <StaffPicker staff={staff} loading={staffLoading} value={staffId} onSelect={handleStaffSelect} />
+        </div>
+
+        {/* Step 5 — date & time */}
+        <div className="mb-8">
+          <p className="mb-4 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[.18em] text-black/35">
+            <span className="pl-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-ink text-[10px] text-white">5</span>
             Pick a date & time
           </p>
 
           <label className="field mb-5">
             <span className="flex items-center gap-1.5">
-              Preferred Date
+             Preferred date
             </span>
             <input
               required
@@ -231,32 +280,54 @@ export default function AppointmentForm() {
 
           <div className="field">
             <span className="flex items-center gap-1.5">
-              Preferred Time
+              Preferred time
             </span>
+            {date && (
+              <p className="mb-2 text-xs text-black/40">
+                {takenLoading
+                  ? "Checking availability…"
+                  : takenSlots.length === 0
+                    ? staffId
+                      ? `${staffName} is free all day on this date.`
+                      : "All time slots are open on this date."
+                    : staffId
+                      ? `${staffName} isn't free at ${takenSlots.length} slot${takenSlots.length > 1 ? "s" : ""} that day — those aren't shown below.`
+                      : `${takenSlots.length} slot${takenSlots.length > 1 ? "s" : ""} that day ${takenSlots.length > 1 ? "are" : "is"} fully booked and not shown below.`}
+              </p>
+            )}
             <div className="space-y-3 rounded-2xl border border-black/10 bg-[#f8f6f1] p-3.5">
-              {TIME_PERIODS.map((period) => (
-                <div key={period.label}>
-                  <p className="mb-1.5 text-[10px] font-bold uppercase tracking-[.16em] text-black/30">
-                    {period.label}
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {period.slots.map((slot) => (
-                      <button
-                        type="button"
-                        key={slot}
-                        onClick={() => setTime(slot)}
-                        className={`rounded-full border px-3.5 py-2 text-xs font-semibold transition ${
-                          time === slot
-                            ? "border-ink bg-ink text-white"
-                            : "border-black/10 bg-white text-black/60 hover:border-gold/50 hover:text-ink"
-                        }`}
-                      >
-                        {slot}
-                      </button>
-                    ))}
+              {TIME_PERIODS.map((period) => {
+                const availableSlots = date ? period.slots.filter((s) => !takenSlots.includes(s)) : period.slots;
+                if (availableSlots.length === 0) return null;
+                return (
+                  <div key={period.label}>
+                    <p className="mb-1.5 text-[10px] font-bold uppercase tracking-[.16em] text-black/30">
+                      {period.label}
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {availableSlots.map((slot) => (
+                        <button
+                          type="button"
+                          key={slot}
+                          onClick={() => setTime(slot)}
+                          className={`rounded-full border px-3.5 py-2 text-xs font-semibold transition ${
+                            time === slot
+                              ? "border-ink bg-ink text-white"
+                              : "border-black/10 bg-white text-black/60 hover:border-gold/50 hover:text-ink"
+                          }`}
+                        >
+                          {slot}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
+              {date && !takenLoading && TIME_PERIODS.every((p) => p.slots.every((s) => takenSlots.includes(s))) && (
+                <p className="py-2 text-center text-xs text-black/40">
+                  {staffId ? `${staffName} is fully booked this day — try another date or "No preference."` : "This day is fully booked — try another date."}
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -280,6 +351,12 @@ export default function AppointmentForm() {
                 <p>
                   <span className="text-black/40">Service — </span>
                   {service.name} <span className="text-gold">₹{Number(service.price).toLocaleString("en-IN")}</span>
+                </p>
+              )}
+              {staffId && (
+                <p>
+                  <span className="text-black/40">Stylist — </span>
+                  {staffName}
                 </p>
               )}
               {date && (
@@ -316,14 +393,14 @@ export default function AppointmentForm() {
         <button
           type="submit"
           disabled={submitting}
-          className="group mt-7 flex w-full items-center justify-center gap-2 rounded-full bg-ink px-6 py-4 text-sm font-semibold text-white transition disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-none"
+          className="group mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-ink px-6 py-4 text-sm font-semibold text-white"
         >
           {submitting ? "Sending…" : "Request appointment"}
           {!submitting && (
             <ArrowUpRight size={16} />
           )}
         </button>
-        <p className="mt-3 text-center text-xs text-black/40">
+        <p className="mt-2 text-center text-xs text-black/40">
           We'll confirm your appointment by phone or WhatsApp shortly after you submit.
         </p>
       </div>

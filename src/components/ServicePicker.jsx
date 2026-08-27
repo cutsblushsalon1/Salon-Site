@@ -1,12 +1,18 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Search, ChevronDown, Check, Sparkles } from "lucide-react";
 
+// Gender is controlled by the parent (AppointmentForm) so the big "Who's
+// this for?" selector and this dropdown's own quick-filter chips always
+// agree on one value instead of drifting apart.
 export const GENDER_OPTIONS = [
   { id: "all", label: "All" },
   { id: "Female", label: "Women" },
   { id: "Male", label: "Men" },
 ];
 
+// Searchable / filterable picker for the salon's full service catalog
+// (200+ services). Renders as a single field (matches the rest of the
+// form) that expands into a search box + category chips + results list.
 export default function ServicePicker({
   services,
   loading,
@@ -79,7 +85,7 @@ export default function ServicePicker({
 
       {open && (
         <div className="absolute z-30 mt-2 w-full overflow-hidden rounded-[1.5rem] border border-black/10 bg-white shadow-[0_25px_70px_rgba(17,17,15,.16)]">
-          <div className="border-b border-black/10 bg-[#fbfaf7] p-4">
+          <div className="border-b border-black/10 bg-[#fbfaf7] p-3">
             <div className="flex items-center gap-2 rounded-full border border-black/10 bg-white px-3.5 py-2.5">
               <Search size={15} className="shrink-0 text-black/35" />
               <input
@@ -91,13 +97,13 @@ export default function ServicePicker({
               />
             </div>
 
-            <div className="mt-4 flex gap-1.5 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div className="mt-2.5 flex gap-1.5 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {GENDER_OPTIONS.map((g) => (
                 <button
                   type="button"
                   key={g.id}
                   onClick={() => onGenderChange(g.id)}
-                  className={`shrink-0 rounded-full px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wide transition ${
+                  className={`shrink-0 rounded-full p-1.5 px-4 text-[11px] font-semibold uppercase tracking-wide transition ${
                     gender === g.id ? "bg-ink text-white" : "bg-[#f2efe8] text-black/50 hover:bg-[#ece7dc]"
                   }`}
                 >
@@ -106,13 +112,13 @@ export default function ServicePicker({
               ))}
             </div>
 
-            <div className="mt-2 flex gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div className="mt-2 flex gap-1.5 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {categories.map((c) => (
                 <button
                   type="button"
                   key={c}
                   onClick={() => setCategory(c)}
-                  className={`shrink-0 rounded-full border px-3 py-1.5 text-[11px] font-semibold transition ${
+                  className={`shrink-0 rounded-full border p-1.5 px-4 text-[11px] font-semibold transition ${
                     category === c
                       ? "border-gold bg-gold/10 text-ink"
                       : "border-black/10 bg-white text-black/45 hover:border-black/20"
