@@ -486,7 +486,7 @@ I'm interested in the *${plan.name}* Membership.
 *Service Discount:* ${plan.serviceDiscount}%
 *Product Discount:* ${plan.productDiscount}%
 
-*Free services:* ${plan.complimentaryServices.women} for women • ${plan.complimentaryServices.men} for men
+*Free haircuts:* ${plan.complimentaryServices.women} for women • ${plan.complimentaryServices.men} for men
 *Extra discount on events:* ${plan.eventDiscount}%
 
 I would like to know more and purchase this membership.`;
@@ -628,13 +628,13 @@ I would like to know more and purchase this membership.`;
                         </span>
 
                         <span className={`text-xs font-medium ${subtleText}`}>
-                          Free services
+                          Free haircuts
                         </span>
                       </div>
 
                       <span className="text-xs font-semibold">
                         {plan.complimentaryServices.women} women
-                        <span className={`px-1.5 ${mutedText}`}>+</span>
+                        <span className={`px-1.5 ${mutedText}`}>•</span>
                         {plan.complimentaryServices.men} men
                       </span>
                     </div>
