@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Flower2, Scissors, Users, Calendar, Clock, CheckCircle2, AlertCircle, ArrowUpRight } from "lucide-react";
+import { Flower2, Scissors, Users, Calendar, Clock, CheckCircle2, AlertCircle, ArrowUpRight, Tag } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "../lib/supabaseClient";
 import { usePublicServices } from "../hooks/usePublicServices";
 import { usePublicStaff } from "../hooks/usePublicStaff";
@@ -14,6 +14,12 @@ const GENDER_CARDS = [
   { id: "Female", label: "Female", icon: Flower2 },
   { id: "all", label: "Either", icon: Users },
 ];
+
+const WEBSITE_DISCOUNT = 25;
+
+function discountedPrice(price) {
+  return Math.round(Number(price) * (1 - WEBSITE_DISCOUNT / 100));
+}
 
 function buildTimePeriods() {
   const periods = [
@@ -106,7 +112,7 @@ export default function AppointmentForm() {
     setResult(null);
 
     if (!isSupabaseConfigured) {
-      const message = `Hi *Cuts & Blush Salon!*\n\nI'd like to book an appointment.\n*Name:* ${name}\n*Phone:* ${phone}\n*For:* ${appointmentGender === "Female" ? "Her" : appointmentGender === "Male" ? "Him" : "-"}\n*Service:* ${service.name} (₹${Number(service.price).toLocaleString("en-IN")})\n*Stylist:* ${staffName || "No preference"}\n*Date:* ${date}\n*Time:* ${time}${notes ? `\n*Notes:* ${notes}` : ""}`;
+      const message = `Hi *Cuts & Blush Salon!*\n\nI'd like to book an appointment.\n*Name:* ${name}\n*Phone:* ${phone}\n*For:* ${appointmentGender === "Female" ? "Her" : appointmentGender === "Male" ? "Him" : "-"}\n*Service:* ${service.name}\n*Regular Price:* ₹${Number(service.price).toLocaleString("en-IN")}\n*Website Offer (25% OFF):* ₹${discountedPrice(service.price).toLocaleString("en-IN")}\n*Stylist:* ${staffName || "No preference"}\n*Date:* ${date}\n*Time:* ${time}${notes ? `\n*Notes:* ${notes}` : ""}`;
       window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, "_blank");
       setSubmitting(false);
       return;
@@ -350,7 +356,16 @@ export default function AppointmentForm() {
               {service && (
                 <p>
                   <span className="text-black/40">Service — </span>
-                  {service.name} <span className="text-gold">₹{Number(service.price).toLocaleString("en-IN")}</span>
+                  {service.name}{" "}
+                  <span className="ml-1 text-black/35 line-through">
+                    ₹{Number(service.price).toLocaleString("en-IN")}
+                  </span>
+                  <span className="ml-2 font-semibold text-gold">
+                    ₹{discountedPrice(service.price).toLocaleString("en-IN")}
+                  </span>
+                  <span className="ml-2 rounded-full bg-gold/10 px-2 py-0.5 whitespace-nowrap text-xs font-bold uppercase tracking-wider text-gold">
+                    25% OFF
+                  </span>
                 </p>
               )}
               {staffId && (

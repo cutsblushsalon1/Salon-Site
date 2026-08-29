@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { motion, useScroll, useTransform } from "framer-motion";
 import gsap from "gsap";
@@ -11,6 +11,8 @@ import {
   Phone,
   Star,
   MessageCircle,
+  X,
+  Tag,
 } from "lucide-react";
 import "remixicon/fonts/remixicon.css";
 import "./global.css";
@@ -143,6 +145,94 @@ const staffMembers = [
 
 const looks = ["/salon1.jpg", "/salon2.jpg", "/salon3.jpg"];
 
+function OfferPopup() {
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    const dismissed = sessionStorage.getItem("cuts-blush-offer-dismissed");
+    if (dismissed) return;
+
+    const timer = window.setTimeout(() => setOpen(true), 1200);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  const close = () => {
+    sessionStorage.setItem("cuts-blush-offer-dismissed", "1");
+    setOpen(false);
+  };
+
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/45 p-5 backdrop-blur-sm">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="offer-title"
+        className="relative w-full max-w-md overflow-hidden rounded-[2rem] bg-[#f6f3ed] shadow-[0_30px_100px_rgba(0,0,0,.28)]"
+      >
+        <button
+          type="button"
+          onClick={close}
+          aria-label="Close offer"
+          className="absolute right-4 top-4 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white/75 text-black/60 backdrop-blur transition hover:bg-white hover:text-black"
+        >
+          <X size={18} />
+        </button>
+
+        <div className="relative overflow-hidden bg-ink px-7 pb-8 pt-9 text-white sm:px-9">
+          <div
+            aria-hidden="true"
+            className="absolute -right-20 -top-24 h-56 w-56 rounded-full border border-gold/20"
+          />
+          <div
+            aria-hidden="true"
+            className="absolute -bottom-32 -left-20 h-64 w-64 rounded-full border border-white/10"
+          />
+
+          <div className="relative">
+            <span className="inline-flex items-center gap-2 rounded-full border border-gold/30 bg-gold/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[.18em] text-gold">
+              <Tag size={13} />
+              Website exclusive
+            </span>
+
+            <p className="mt-6 text-xs font-semibold uppercase tracking-[.2em] text-white/45">
+              Book online & save
+            </p>
+            <h2 id="offer-title" className="mt-2 font-display text-6xl leading-[.82] tracking-tight sm:text-7xl">
+              25%<br />
+              <em>OFF</em>
+            </h2>
+            <p className="mt-5 max-w-xs text-sm leading-6 text-white/65">
+              Get a flat <strong className="text-white">25% discount on all services</strong> when you book your appointment through this website.
+            </p>
+          </div>
+        </div>
+
+        <div className="p-5 sm:p-6">
+          <a
+            href="#appointment"
+            onClick={close}
+            className="group flex w-full items-center justify-between rounded-full bg-ink px-5 py-4 text-sm font-semibold text-white transition hover:-translate-y-0.5"
+          >
+            <span>Book & get 25% off</span>
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10">
+              <ArrowUpRight size={17} />
+            </span>
+          </a>
+          <button
+            type="button"
+            onClick={close}
+            className="mt-3 w-full py-2 text-xs font-semibold text-black/40 transition hover:text-black"
+          >
+            Maybe later
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function App() {
   const heroRef = useRef(null);
 
@@ -193,6 +283,7 @@ function App() {
 
   return (
     <main className="min-h-screen bg-cream text-ink selection:bg-gold selection:text-white">
+      <OfferPopup />
       <Header />
 
       {/* Hero */}
@@ -272,6 +363,21 @@ function App() {
               From a quick refresh to a full transformation, every appointment
               is designed to feel personal—not processed.
             </p>
+          </div>
+
+          <div className="reveal mb-8 flex flex-col gap-4 overflow-hidden rounded-[1.5rem] border border-gold/25 bg-white/70 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+            <div className="flex items-start gap-3">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gold/10 text-gold">
+                <Tag size={18} />
+              </span>
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[.18em] text-gold">Book online & save</p>
+                <p className="mt-1 text-sm font-semibold text-ink sm:text-base">Flat 25% OFF on all services when you book through this website.</p>
+              </div>
+            </div>
+            <a href="#appointment" className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-ink px-5 py-3 text-xs font-semibold text-white">
+              Claim offer <ArrowUpRight size={15} />
+            </a>
           </div>
 
           <div className="grid gap-3 md:grid-cols-2">
@@ -973,14 +1079,18 @@ I would like to know more and purchase this membership.`;
             </p>
             <div className="mt-8 space-y-3 text-sm">
               <div className="rounded-2xl bg-white/60 p-4">
+                <strong>Booking discount</strong>
+                <span className="ml-1 text-black/45">flat 25% on all services</span>
+              </div>
+              <div className="rounded-2xl bg-white/60 p-4">
                 <strong>Walk-ins welcome</strong>
-                <span className="ml-2 text-black/45">
+                <span className="ml-1 text-black/45">
                   subject to availability
                 </span>
               </div>
               <div className="rounded-2xl bg-white/60 p-4">
                 <strong>Easy confirmation</strong>
-                <span className="ml-2 text-black/45">phone or WhatsApp</span>
+                <span className="ml-1 text-black/45">via phone or WhatsApp</span>
               </div>
             </div>
           </div>
