@@ -1155,15 +1155,15 @@ I would like to know more and purchase this membership.`;
             {[
               [
                 "“Loved the finish and the attention to detail. The whole experience felt premium.”",
-                "Local client",
+                "Santosh Kumar",
               ],
               [
                 "“Finally found a salon where they actually listen before starting. Highly recommended.”",
-                "Local client",
+                "Komal Kumari",
               ],
               [
                 "“Clean space, friendly team and great styling. I'll definitely be back.”",
-                "Local client",
+                "Deepak Kumar",
               ],
             ].map(([q, a]) => (
               <blockquote
