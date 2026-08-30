@@ -18,9 +18,17 @@ function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [active, setActive] = useState("#top");
 
+  const isLegalPage =
+    window.location.pathname === "/privacy-policy" ||
+    window.location.pathname === "/terms-and-conditions";
+
+  const homeHref = (hash) => (isLegalPage ? `/${hash}` : hash);
+
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 40);
+
+      if (isLegalPage) return;
 
       const sections = [
         "top",
@@ -50,13 +58,12 @@ function Header() {
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
-
     handleScroll();
 
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, []);
+  }, [isLegalPage]);
 
   const closeMenu = () => {
     setOpen(false);
@@ -121,9 +128,8 @@ function Header() {
           `}
         >
           <div className="flex items-center justify-between">
-            {/* LOGO */}
             <a
-              href="#top"
+              href="/"
               onClick={closeMenu}
               className="group relative flex items-center"
             >
@@ -132,7 +138,6 @@ function Header() {
               </div>
             </a>
 
-            {/* DESKTOP NAVIGATION */}
             <nav className="hidden items-center gap-1 md:flex">
               {navItems.map((item) => {
                 const isActive = active === item.href;
@@ -140,10 +145,10 @@ function Header() {
                 return (
                   <a
                     key={item.href}
-                    href={item.href}
+                    href={homeHref(item.href)}
                     className="relative rounded-full px-4 py-2 text-[13px] font-medium text-black/65 transition-colors duration-300 hover:text-black"
                   >
-                    {isActive && (
+                    {!isLegalPage && isActive && (
                       <motion.span
                         layoutId="activeNav"
                         className="absolute inset-0 -z-10 rounded-full bg-black/[0.055]"
@@ -161,13 +166,10 @@ function Header() {
               })}
             </nav>
 
-            {/* DESKTOP CTA */}
             <div className="hidden md:block">
               <motion.a
-                href="#appointment"
-                whileTap={{
-                  scale: 0.98,
-                }}
+                href={homeHref("#appointment")}
+                whileTap={{ scale: 0.98 }}
                 className="group flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-[13px] font-semibold text-white"
               >
                 <span>Book Appointment</span>
@@ -178,7 +180,6 @@ function Header() {
               </motion.a>
             </div>
 
-            {/* MOBILE MENU BUTTON */}
             <motion.button
               whileTap={{ scale: 0.9 }}
               onClick={() => setOpen((value) => !value)}
@@ -211,7 +212,6 @@ function Header() {
           </div>
         </motion.div>
 
-        {/* MOBILE NAVIGATION */}
         <AnimatePresence>
           {open && (
             <motion.div
@@ -229,7 +229,7 @@ function Header() {
                     variants={itemVariants}
                     initial="hidden"
                     animate="visible"
-                    href={item.href}
+                    href={homeHref(item.href)}
                     onClick={closeMenu}
                     className={`
                       group flex items-center justify-between
@@ -237,7 +237,7 @@ function Header() {
                       text-[15px] font-medium
                       transition-colors duration-300
                       ${
-                        active === item.href
+                        !isLegalPage && active === item.href
                           ? "bg-black/[0.045] text-black"
                           : "text-black/60 hover:bg-black/[0.035] hover:text-black"
                       }
@@ -253,19 +253,12 @@ function Header() {
                 ))}
               </div>
 
-              {/* MOBILE BOOKING CTA */}
               <motion.a
-                href="#book"
+                href={homeHref("#book")}
                 onClick={closeMenu}
                 initial={{ opacity: 0, y: 10 }}
-                animate={{
-                  opacity: 1,
-                  y: 0,
-                }}
-                transition={{
-                  delay: 0.3,
-                  duration: 0.4,
-                }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3, duration: 0.4 }}
                 className="mt-3 flex items-center justify-between rounded-[1.2rem] bg-ink px-5 py-4 text-white"
               >
                 <div>
@@ -283,7 +276,6 @@ function Header() {
                 </span>
               </motion.a>
 
-              {/* LOCATION */}
               <div className="px-4 pb-2 pt-5 text-[11px] uppercase tracking-[.16em] text-black/35">
                 East Ram Krishna Nagar · Patna
               </div>
@@ -292,7 +284,6 @@ function Header() {
         </AnimatePresence>
       </header>
 
-      {/* MOBILE STICKY BOOKING BAR */}
       <motion.div
         initial={{ y: 100 }}
         animate={{
@@ -305,7 +296,7 @@ function Header() {
         className="fixed bottom-3 left-3 right-3 z-40 md:hidden"
       >
         <a
-          href="#book"
+          href={homeHref("#book")}
           className="flex items-center justify-between rounded-2xl border border-white/10 bg-ink px-4 py-3 text-white shadow-[0_15px_50px_rgba(0,0,0,.2)]"
         >
           <div>

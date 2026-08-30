@@ -4,12 +4,10 @@ const Footer = () => {
   return (
     <footer className="bg-ink px-5 pb-7 pt-16 text-white md:px-10 md:pt-20">
       <div className="mx-auto max-w-7xl">
-        {/* Main footer */}
         <div className="grid gap-12 md:grid-cols-[1.3fr_.7fr_.7fr]">
-          {/* Brand */}
           <div>
             <a
-              href="#top"
+              href="/"
               className="inline-flex items-baseline font-display text-3xl tracking-[-.04em]"
             >
               Cuts & Blush Salon
@@ -25,7 +23,6 @@ const Footer = () => {
             </p>
           </div>
 
-          {/* Explore */}
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[.2em] text-white/30">
               Explore
@@ -33,10 +30,10 @@ const Footer = () => {
 
             <div className="mt-5 flex flex-col gap-3">
               {[
-                ["Services", "#services"],
-                ["Experience", "#experience"],
-                ["Looks", "#looks"],
-                ["Book appointment", "#book"],
+                ["Services", "/#services"],
+                ["Experience", "/#experience"],
+                ["Looks", "/#looks"],
+                ["Book appointment", "/#book"],
               ].map(([label, href]) => (
                 <a
                   key={label}
@@ -49,7 +46,6 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Contact */}
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[.2em] text-white/30">
               Contact
@@ -84,31 +80,35 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Divider */}
         <div className="my-12 h-px bg-white/10" />
 
-        {/* Bottom footer */}
         <div className="flex flex-col gap-5 text-xs text-white/30 sm:flex-row sm:items-center sm:justify-between">
           <p>
             © {new Date().getFullYear()} Cuts & Blush Unisex Salon. All rights
             reserved.
           </p>
 
-          <div className="flex items-center gap-5">
-            <a href="#" className="transition-colors hover:text-white">
-              Privacy
-            </a>
-
-            <a href="#" className="transition-colors hover:text-white">
-              Terms
+          <div className="flex flex-wrap items-center gap-5">
+            <a
+              href="/privacy-policy"
+              className="transition-colors hover:text-white"
+            >
+              Privacy Policy
             </a>
 
             <a
-              href="#top"
+              href="/terms-and-conditions"
+              className="transition-colors hover:text-white"
+            >
+              Terms & Conditions
+            </a>
+
+            <a
+              href="/"
               className="flex items-center gap-2 transition-colors hover:text-white"
             >
               Back to top
-              <i class="ri-arrow-right-up-line"></i>
+              <i className="ri-arrow-right-up-line"></i>
             </a>
           </div>
         </div>
