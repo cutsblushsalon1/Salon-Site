@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Search, ChevronDown, Check, Sparkles } from "lucide-react";
+import { Search, ChevronDown, Check, Sparkles, Plus, Minus, Layers3 } from "lucide-react";
 
 // Gender is controlled by the parent (AppointmentForm) so the big "Who's
 // this for?" selector and this dropdown's own quick-filter chips always
@@ -26,6 +26,7 @@ export default function ServicePicker({
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("All");
   const wrapRef = useRef(null);
+  const [expandedComboId, setExpandedComboId] = useState(null);
 
   const categories = useMemo(() => {
     const set = new Set(services.map((s) => s.category).filter(Boolean));
@@ -139,36 +140,86 @@ export default function ServicePicker({
             )}
             {filtered.map((s) => {
               const selected = value?.id === s.id;
+              const isCombo = Boolean(s.isCombo);
+              const included = isCombo
+                ? (s.comboServiceIds || [])
+                    .map((id) => services.find((service) => service.id === id))
+                    .filter(Boolean)
+                : [];
+              const expanded = expandedComboId === s.id;
+
               return (
-                <button
-                  type="button"
+                <div
                   key={s.id}
-                  onClick={() => {
-                    onSelect(s);
-                    setOpen(false);
-                    setQuery("");
-                  }}
-                  className={`flex w-full items-center justify-between gap-3 border-b border-l-2 border-black/[0.04] px-4 py-3 text-left text-sm transition last:border-b-0 ${
-                    selected ? "border-l-gold bg-gold/[0.06]" : "border-l-transparent hover:bg-[#f8f6f1]"
+                  className={`border-b border-l-2 border-black/[0.04] last:border-b-0 ${
+                    selected ? "border-l-gold bg-gold/[0.05]" : "border-l-transparent"
                   }`}
                 >
-                  <span className="min-w-0">
-                    <span className="block truncate font-medium text-ink/90">{s.name}</span>
-                    <span className="mt-0.5 block text-[11px] text-black/40">
-                      {s.category} · {s.gender === "Female" ? "Women" : "Men"}
-                    </span>
-                  </span>
-                  <span className="flex shrink-0 items-center gap-2">
-                    <span className="text-xs font-semibold text-gold">
-                      ₹{Number(s.price).toLocaleString("en-IN")}
-                    </span>
-                    {selected && (
-                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-ink text-white">
-                        <Check size={11} />
+                  <div className="flex items-center gap-3 px-4 py-3">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onSelect(s);
+                        setOpen(false);
+                        setQuery("");
+                      }}
+                      className="min-w-0 flex-1 text-left"
+                    >
+                      <div className="flex min-w-0 items-center gap-2">
+                        <span className="truncate font-medium text-ink/90">{s.name}</span>
+                      </div>
+                      <span className="mt-1 block text-[11px] text-black/40">
+                        {s.category} · {s.gender === "Female" ? "Women" : "Men"}
                       </span>
-                    )}
-                  </span>
-                </button>
+                    </button>
+
+                    <div className="flex shrink-0 items-center gap-2">
+                      <span className="text-xs font-semibold text-gold">
+                        ₹{Number(s.price).toLocaleString("en-IN")}
+                      </span>
+                      {isCombo && included.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => setExpandedComboId(expanded ? null : s.id)}
+                          aria-expanded={expanded}
+                          aria-label={`${expanded ? "Hide" : "View"} services in ${s.name}`}
+                          className="flex h-8 w-8 items-center justify-center rounded-full border border-black/10 bg-white text-black/45 transition hover:border-gold/50 hover:text-ink"
+                        >
+                          {expanded ? <Minus size={14} /> : <Plus size={14} />}
+                        </button>
+                      )}
+                      {selected && (
+                        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-ink text-white">
+                          <Check size={12} />
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {isCombo && expanded && (
+                    <div className="mx-4 mb-3 overflow-hidden rounded-2xl border border-gold/20 bg-[#fbfaf7]">
+                      <div className="flex items-center justify-between border-b border-black/[0.06] px-3.5 py-2.5">
+                        <div>
+                          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-black/35">
+                            Included services
+                          </p>
+                          <p className="mt-0.5 text-[11px] text-black/40">{included.length} services in this combo</p>
+                        </div>
+                      </div>
+                      <div className="grid gap-1.5 p-2.5 sm:grid-cols-2">
+                        {included.map((item) => (
+                          <div
+                            key={item.id}
+                            className="flex items-center justify-between gap-2 rounded-xl bg-white px-3 py-2 ring-1 ring-black/[0.04]"
+                          >
+                            <span className="min-w-0 truncate text-[11px] font-medium text-ink/80">{item.name}</span>
+                            <span className="shrink-0 text-[10px] text-black/35">₹{Number(item.price).toLocaleString("en-IN")}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
               );
             })}
           </div>
