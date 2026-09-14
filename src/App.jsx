@@ -152,7 +152,7 @@ function OfferPopup() {
     const dismissed = sessionStorage.getItem("cuts-blush-offer-dismissed");
     if (dismissed) return;
 
-    const timer = window.setTimeout(() => setOpen(true), 1200);
+    const timer = window.setTimeout(() => setOpen(true), 3200);
     return () => window.clearTimeout(timer);
   }, []);
 
@@ -213,17 +213,17 @@ function OfferPopup() {
           <a
             href="#appointment"
             onClick={close}
-            className="group flex w-full items-center justify-between rounded-full bg-ink px-5 py-4 text-sm font-semibold text-white transition hover:-translate-y-0.5"
+            className="group flex w-full items-center justify-between rounded-full bg-ink px-5 py-4 text-sm font-semibold text-white"
           >
-            <span>Book & get 25% off</span>
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10">
-              <ArrowUpRight size={17} />
+            <span>Claim 25% Discount Offer</span>
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10">
+              <ArrowUpRight size={16} />
             </span>
           </a>
           <button
             type="button"
             onClick={close}
-            className="mt-3 w-full py-2 text-xs font-semibold text-black/40 transition hover:text-black"
+            className="mt-2 w-full py-2 text-xs font-semibold text-black/40 transition hover:text-black"
           >
             Maybe later
           </button>

@@ -17,7 +17,19 @@ const GENDER_CARDS = [
 
 const WEBSITE_DISCOUNT = 25;
 
-function discountedPrice(price) {
+// Services in this category (created via the Services page in the billing
+// app) are already sold at a bundled combo price, so the site-wide 25%
+// booking discount is never layered on top of them. Matched
+// case-insensitively so however it was typed in ("Special Combo",
+// "special combo", …) still counts.
+const NO_DISCOUNT_CATEGORY = "Special Combo";
+
+function isNoDiscountCategory(category) {
+  return String(category || "").trim().toLowerCase() === NO_DISCOUNT_CATEGORY.toLowerCase();
+}
+
+function discountedPrice(price, category) {
+  if (isNoDiscountCategory(category)) return Math.round(Number(price));
   return Math.round(Number(price) * (1 - WEBSITE_DISCOUNT / 100));
 }
 
@@ -112,7 +124,11 @@ export default function AppointmentForm() {
     setResult(null);
 
     if (!isSupabaseConfigured) {
-      const message = `Hi *Cuts & Blush Salon!*\n\nI'd like to book an appointment.\n*Name:* ${name}\n*Phone:* ${phone}\n*For:* ${appointmentGender === "Female" ? "Her" : appointmentGender === "Male" ? "Him" : "-"}\n*Service:* ${service.name}\n*Regular Price:* ₹${Number(service.price).toLocaleString("en-IN")}\n*Website Offer (25% OFF):* ₹${discountedPrice(service.price).toLocaleString("en-IN")}\n*Stylist:* ${staffName || "No preference"}\n*Date:* ${date}\n*Time:* ${time}${notes ? `\n*Notes:* ${notes}` : ""}`;
+      const noDiscount = isNoDiscountCategory(service.category);
+      const priceLines = noDiscount
+        ? `*Price:* ₹${Number(service.price).toLocaleString("en-IN")} (combo price — website discount doesn't apply)`
+        : `*Regular Price:* ₹${Number(service.price).toLocaleString("en-IN")}\n*Website Offer (25% OFF):* ₹${discountedPrice(service.price, service.category).toLocaleString("en-IN")}`;
+      const message = `Hi *Cuts & Blush Salon!*\n\nI'd like to book an appointment.\n*Name:* ${name}\n*Phone:* ${phone}\n*For:* ${appointmentGender === "Female" ? "Her" : appointmentGender === "Male" ? "Him" : "-"}\n*Service:* ${service.name}\n${priceLines}\n*Stylist:* ${staffName || "No preference"}\n*Date:* ${date}\n*Time:* ${time}${notes ? `\n*Notes:* ${notes}` : ""}`;
       window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, "_blank");
       setSubmitting(false);
       return;
@@ -357,15 +373,23 @@ export default function AppointmentForm() {
                 <p>
                   <span className="text-black/40">Service — </span>
                   {service.name}{" "}
-                  <span className="ml-1 text-black/35 line-through">
-                    ₹{Number(service.price).toLocaleString("en-IN")}
-                  </span>
-                  <span className="ml-2 font-semibold text-gold">
-                    ₹{discountedPrice(service.price).toLocaleString("en-IN")}
-                  </span>
-                  <span className="ml-2 rounded-full bg-gold/10 px-2 py-0.5 whitespace-nowrap text-xs font-bold uppercase tracking-wider text-gold">
-                    25% OFF
-                  </span>
+                  {isNoDiscountCategory(service.category) ? (
+                    <span className="ml-1 font-semibold text-ink">
+                      ₹{Number(service.price).toLocaleString("en-IN")}
+                    </span>
+                  ) : (
+                    <>
+                      <span className="ml-1 text-black/35 line-through">
+                        ₹{Number(service.price).toLocaleString("en-IN")}
+                      </span>
+                      <span className="ml-2 font-semibold text-gold">
+                        ₹{discountedPrice(service.price, service.category).toLocaleString("en-IN")}
+                      </span>
+                      <span className="ml-2 rounded-full bg-gold/10 px-2 py-0.5 whitespace-nowrap text-xs font-bold uppercase tracking-wider text-gold">
+                        25% OFF
+                      </span>
+                    </>
+                  )}
                 </p>
               )}
               {staffId && (
