@@ -130,10 +130,10 @@ const staffMembers = [
     image: "/staffs/staff3.jpg",
   },
   {
-    name: "Rihan Salmani",
-    experience: 10,
-    role: "Senior Hair & Skin Artist",
-    image: "/staffs/staff4.jpg",
+    name: "Vikash Kumar",
+    experience: 6,
+    role: "Unisex Hair Stylist",
+    image: "/staffs/staff6.jpg",
   },
   {
     name: "Priya Kumari",
@@ -225,7 +225,7 @@ function OfferPopup() {
             onClick={close}
             className="mt-2 w-full py-2 text-xs font-semibold text-black/40 transition hover:text-black"
           >
-            Maybe later
+            Not Interested
           </button>
         </div>
       </div>
